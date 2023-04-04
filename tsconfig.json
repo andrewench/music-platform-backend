@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
+    "baseUrl": "app",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -16,6 +16,14 @@
     "noImplicitAny": true,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@/services": ["services"],
+      "@/types": ["types"],
+      "@/utils": ["utils"],
+      "@/middlewares": ["middlewares"],
+      "@/modules": ["modules"],
+      "@/constants": ["constants"]
+    }
   }
 }

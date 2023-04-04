@@ -1,7 +1,7 @@
 {
   "printWidth": 80,
   "tabWidth": 2,
-  "useTabs": true,
+  "useTabs": false,
   "semi": false,
   "singleQuote": true,
   "jsxSingleQuote": false,
@@ -9,7 +9,15 @@
   "arrowParens": "avoid",
   "trailingComma": "all",
   "importOrder": [
-    "<THIRD_PARTY_MODULES>"
+    "<THIRD_PARTY_MODULES>",
+    "^@/services",
+    "^@/types",
+    "^@/utils",
+    "^@/middlewares",
+    "^@/modules",
+    "^@/constants",
+    "^(.*interface)$",
+    "^(.*service)$"
   ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
