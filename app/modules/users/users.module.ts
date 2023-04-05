@@ -1,6 +1,8 @@
 import { UsersController } from './users.controller'
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
+import { TSignUpFields } from '@/types'
+
 import { applyMiddleware } from '@/utils'
 
 import { BodyValidator } from '@/middlewares'
@@ -15,10 +17,15 @@ import { UsersService } from './users.service'
 })
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    applyMiddleware(consumer, BodyValidator(['email']), '/api/users', 'POST'),
+    applyMiddleware(
+      consumer,
+      BodyValidator<{ email: string }>(['email']),
+      '/api/users',
+      'POST',
+    ),
       applyMiddleware(
         consumer,
-        BodyValidator(VALID_SIGN_UP_FIELDS),
+        BodyValidator<TSignUpFields>(VALID_SIGN_UP_FIELDS),
         '/api/register',
         'PUT',
       )

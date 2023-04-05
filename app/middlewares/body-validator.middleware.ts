@@ -5,15 +5,19 @@ import {
   Type,
   mixin,
 } from '@nestjs/common'
-import { NextFunction } from 'express'
+import { NextFunction, Request } from 'express'
+
+import { TMappedTypes } from '@/types'
 
 import { isAllFieldsPassedCorrectly } from '@/utils'
 
-export const BodyValidator = (validFields: string[]): Type<NestMiddleware> => {
+export const BodyValidator = <TBody extends TMappedTypes>(
+  validFields: (keyof TBody)[],
+): Type<NestMiddleware> => {
   @Injectable()
   class BodyValidatorMiddleware implements NestMiddleware {
-    use({ body }: Request, _: never, next: NextFunction) {
-      const isFieldsValid = isAllFieldsPassedCorrectly({
+    use({ body }: Request<never, never, TBody>, _: never, next: NextFunction) {
+      const isFieldsValid = isAllFieldsPassedCorrectly<TBody, (keyof TBody)[]>({
         body,
         validFields,
       })

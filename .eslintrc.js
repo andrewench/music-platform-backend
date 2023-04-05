@@ -23,7 +23,6 @@ module.exports = {
     "arrow-body-style": "off",
     "consistent-return": "off",
     "no-shadow": "off",
-    "no-unused-vars": "warn",
     'import/no-unresolved': "off",
 
     '@typescript-eslint/interface-name-prefix': 'off',

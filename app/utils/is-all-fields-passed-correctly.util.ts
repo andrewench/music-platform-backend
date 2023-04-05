@@ -1,13 +1,16 @@
 import { TMappedTypes } from '@/types'
 
-interface IUtilParams<TBody extends TMappedTypes, TKeys extends string[]> {
+interface IUtilParams<
+  TBody extends TMappedTypes,
+  TKeys extends (keyof TBody)[],
+> {
   body: TBody
   validFields: TKeys
 }
 
 export const isAllFieldsPassedCorrectly = <
   TBody extends TMappedTypes,
-  TKeys extends string[],
+  TKeys extends (keyof TBody)[],
 >({
   body,
   validFields,
