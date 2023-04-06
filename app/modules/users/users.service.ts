@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common'
 import { User } from '@prisma/client'
 
-import { CryptoService, DatabaseService } from '@/services'
+import { CryptoService, PrismaService } from '@/services'
 
 import { TSafeUser } from '@/types'
 
@@ -16,8 +16,10 @@ import { TUserInstance } from './users.interface'
 
 @Injectable()
 export class UsersService {
+  constructor(private readonly prisma: PrismaService) {}
+
   async getUserByUnique(email: string): Promise<NotFoundException | TSafeUser> {
-    const user = await DatabaseService.user.findFirst({
+    const user = await this.prisma.user.findFirst({
       where: {
         email,
       },
@@ -51,7 +53,7 @@ export class UsersService {
           const hash = await CryptoService.encrypt(password)
 
           if (typeof hash === 'string') {
-            const user = await DatabaseService.user.create({
+            const user = await this.prisma.user.create({
               data: {
                 ...body,
                 password: hash,

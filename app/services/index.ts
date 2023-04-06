@@ -1,2 +1,2 @@
 export { CryptoService } from './crypto.service'
-export { DatabaseService } from './database.service'
+export { PrismaService } from './prisma.service'

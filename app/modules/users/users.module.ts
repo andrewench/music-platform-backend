@@ -1,6 +1,8 @@
 import { UsersController } from './users.controller'
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 
+import { PrismaService } from '@/services'
+
 import { TSignUpFields } from '@/types'
 
 import { applyMiddleware } from '@/utils'
@@ -13,7 +15,7 @@ import { UsersService } from './users.service'
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, PrismaService],
 })
 export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -13,7 +13,7 @@ import { TUserInstance } from './users.interface'
 
 import { UsersService } from './users.service'
 
-@Controller('/api')
+@Controller()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
