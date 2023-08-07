@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "app",
+    "paths": {
+      "@/services": ["services"],
+      "@/types": ["types"],
+      "@/utils": ["utils"],
+      "@/middlewares": ["middlewares"],
+      "@/modules": ["modules"],
+      "@/constants": ["constants"],
+      "@/guards": ["guards"]
+    }
+  }
+}

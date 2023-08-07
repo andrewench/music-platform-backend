@@ -15,6 +15,7 @@
     "^@/utils",
     "^@/middlewares",
     "^@/modules",
+    "^@/guards",
     "^@/constants",
     "^(.*interface)$",
     "^(.*service)$"
