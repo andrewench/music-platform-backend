@@ -3,8 +3,10 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common'
 import { User } from '@prisma/client'
+import { Request } from 'express'
 
 import { CryptoService, PrismaService } from '@/services'
 
@@ -16,7 +18,27 @@ import { TUserInstance } from './users.interface'
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
+
+  async getMe(request: Request) {
+    if (!('user' in request)) throw new UnauthorizedException()
+
+    const { id } = request.user as { id: number }
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id,
+      },
+    })
+
+    if (!user) throw new UnauthorizedException(`User doesn't exists`)
+
+    const safeUserResponse = excludeUnsafeFields<User, 'password'>(user, [
+      'password',
+    ])
+
+    return safeUserResponse
+  }
 
   async getUserByUnique(email: string): Promise<NotFoundException | TSafeUser> {
     const user = await this.prisma.user.findFirst({
