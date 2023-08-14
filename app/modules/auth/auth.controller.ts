@@ -1,6 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common'
+import { Request } from 'express'
 
 import { TSignInFields, TSignUpFields } from '@/types'
+
+import { AuthGuard } from '@/guards'
 
 import { AuthService } from './auth.service'
 
@@ -21,5 +24,11 @@ export class AuthController {
   @Post('/refresh')
   async refresh(@Body() body: { refreshToken: string }) {
     return this.authService.refresh(body)
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete('/logout')
+  async logout(@Req() request: Request) {
+    return this.authService.logout(request)
   }
 }

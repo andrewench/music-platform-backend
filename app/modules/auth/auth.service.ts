@@ -7,6 +7,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { Request } from 'express'
 
 import { CryptoService, PrismaService } from '@/services'
 
@@ -176,6 +177,14 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+    }
+  }
+
+  async logout(request: Request) {
+    if (!('user' in request)) throw new UnauthorizedException()
+
+    return {
+      status: 'logged_out',
     }
   }
 }
