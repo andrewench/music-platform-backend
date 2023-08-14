@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
   ServiceUnavailableException,
+  UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 
@@ -49,8 +50,20 @@ export class AuthService {
       },
     )
 
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      {
+        expiresIn: Constant.RT_LIFE_TIME,
+        secret: Constant.RT_SECRET_KEY,
+      },
+    )
+
     return {
       accessToken,
+      refreshToken,
     }
   }
 
@@ -102,14 +115,67 @@ export class AuthService {
           },
         )
 
+        const refreshToken = await this.jwtService.signAsync(
+          {
+            id: user.id,
+            role: user.role,
+          },
+          {
+            expiresIn: Constant.RT_LIFE_TIME,
+            secret: Constant.RT_SECRET_KEY,
+          },
+        )
+
         return {
           accessToken,
+          refreshToken,
         }
       } else {
         throw new ServiceUnavailableException()
       }
     } else {
       throw new ServiceUnavailableException('Unknown server error')
+    }
+  }
+
+  async refresh(body: { refreshToken: string }) {
+    const payload = await this.jwtService.verifyAsync(body.refreshToken, {
+      secret: process.env.RT_SECRET_KEY,
+    })
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: payload.id,
+      },
+    })
+
+    if (!user) throw new UnauthorizedException(`User doesn't exists`)
+
+    const accessToken = await this.jwtService.signAsync(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      {
+        expiresIn: Constant.AT_LIFE_TIME,
+        secret: Constant.AT_SECRET_KEY,
+      },
+    )
+
+    const refreshToken = await this.jwtService.signAsync(
+      {
+        id: user.id,
+        role: user.role,
+      },
+      {
+        expiresIn: Constant.RT_LIFE_TIME,
+        secret: Constant.RT_SECRET_KEY,
+      },
+    )
+
+    return {
+      accessToken,
+      refreshToken,
     }
   }
 }

@@ -17,4 +17,9 @@ export class AuthController {
   async signup(@Body() body: TSignUpFields) {
     return this.authService.signup(body)
   }
+
+  @Post('/refresh')
+  async refresh(@Body() body: { refreshToken: string }) {
+    return this.authService.refresh(body)
+  }
 }
