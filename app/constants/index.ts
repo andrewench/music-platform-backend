@@ -4,6 +4,8 @@ const Constant = {
 
   RT_SECRET_KEY: process.env.RT_SECRET_KEY,
   RT_LIFE_TIME: 1000 * 60 * 60 * 24,
+
+  STATIC_PATH: '/uploads/images',
 }
 
 export default Constant

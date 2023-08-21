@@ -7,9 +7,15 @@ import {
   Post,
   Put,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { Request } from 'express'
+import { diskStorage } from 'multer'
+import { extname } from 'path'
+import { v4 as uuidv4 } from 'uuid'
 
 import { TSafeUser } from '@/types'
 
@@ -43,5 +49,25 @@ export class UsersController {
   @Put('/register')
   async createNewUser(@Body() body: TUserInstance) {
     return this.usersService.createNewUser(body)
+  }
+
+  @Post('/user/avatar')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: 'uploads/images',
+        filename: (_, file, cb) => {
+          const generatedFileName = uuidv4()
+
+          cb(null, `${generatedFileName}${extname(file.originalname)}`)
+        },
+      }),
+    }),
+  )
+  async uploadAvatar(
+    @Body() body: { userId: string },
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.usersService.uploadAvatar(body, file)
   }
 }

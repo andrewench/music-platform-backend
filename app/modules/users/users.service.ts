@@ -99,4 +99,21 @@ export class UsersService {
       }
     }
   }
+
+  async uploadAvatar(body: { userId: string }, file: Express.Multer.File) {
+    const payload = JSON.parse(JSON.stringify(body))
+
+    await this.prisma.user.update({
+      where: {
+        id: Number(payload.userId),
+      },
+      data: {
+        avatar: `${file.destination}/${file.filename}`,
+      },
+    })
+
+    return {
+      isUploaded: true,
+    }
+  }
 }
