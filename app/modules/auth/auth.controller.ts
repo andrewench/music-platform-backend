@@ -1,23 +1,24 @@
 import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common'
 import { Request } from 'express'
 
-import { TSignInFields, TSignUpFields } from '@/types'
-
 import { AuthGuard } from '@/guards'
 
 import { AuthService } from './auth.service'
+
+import { SignInDto } from './dto/sign-in.dto'
+import { SignUpDto } from './dto/sign-up.dto'
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login')
-  async login(@Body() credentials: TSignInFields) {
+  async login(@Body() credentials: SignInDto) {
     return this.authService.login(credentials)
   }
 
   @Post('/signup')
-  async signup(@Body() body: TSignUpFields) {
+  async signup(@Body() body: SignUpDto) {
     return this.authService.signup(body)
   }
 

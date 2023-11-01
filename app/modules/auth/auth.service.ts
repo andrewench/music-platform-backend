@@ -11,15 +11,16 @@ import { Request } from 'express'
 
 import { CryptoService, PrismaService } from '@/services'
 
-import { TSignInFields, TSignUpFields } from '@/types'
+import Constants from '@/constants'
 
-import Constant from '@/constants'
+import { SignInDto } from './dto/sign-in.dto'
+import { SignUpDto } from './dto/sign-up.dto'
 
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async login(credentials: TSignInFields) {
+  async login(credentials: SignInDto) {
     const { login, password } = credentials
 
     const user = await this.prisma.user.findFirst({
@@ -46,8 +47,8 @@ export class AuthService {
         role: user.role,
       },
       {
-        expiresIn: Constant.AT_LIFE_TIME,
-        secret: Constant.AT_SECRET_KEY,
+        expiresIn: Constants.AT_LIFE_TIME,
+        secret: Constants.AT_SECRET_KEY,
       },
     )
 
@@ -57,8 +58,8 @@ export class AuthService {
         role: user.role,
       },
       {
-        expiresIn: Constant.RT_LIFE_TIME,
-        secret: Constant.RT_SECRET_KEY,
+        expiresIn: Constants.RT_LIFE_TIME,
+        secret: Constants.RT_SECRET_KEY,
       },
     )
 
@@ -68,7 +69,7 @@ export class AuthService {
     }
   }
 
-  async signup(credentials: TSignUpFields) {
+  async signup(credentials: SignUpDto) {
     const { firstName, lastName, login, email, password } = credentials
 
     const user = await this.prisma.user.findFirst({
@@ -111,8 +112,8 @@ export class AuthService {
             role: user.role,
           },
           {
-            expiresIn: Constant.AT_LIFE_TIME,
-            secret: Constant.AT_SECRET_KEY,
+            expiresIn: Constants.AT_LIFE_TIME,
+            secret: Constants.AT_SECRET_KEY,
           },
         )
 
@@ -122,8 +123,8 @@ export class AuthService {
             role: user.role,
           },
           {
-            expiresIn: Constant.RT_LIFE_TIME,
-            secret: Constant.RT_SECRET_KEY,
+            expiresIn: Constants.RT_LIFE_TIME,
+            secret: Constants.RT_SECRET_KEY,
           },
         )
 
@@ -158,8 +159,8 @@ export class AuthService {
         role: user.role,
       },
       {
-        expiresIn: Constant.AT_LIFE_TIME,
-        secret: Constant.AT_SECRET_KEY,
+        expiresIn: Constants.AT_LIFE_TIME,
+        secret: Constants.AT_SECRET_KEY,
       },
     )
 
@@ -169,8 +170,8 @@ export class AuthService {
         role: user.role,
       },
       {
-        expiresIn: Constant.RT_LIFE_TIME,
-        secret: Constant.RT_SECRET_KEY,
+        expiresIn: Constants.RT_LIFE_TIME,
+        secret: Constants.RT_SECRET_KEY,
       },
     )
 

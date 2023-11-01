@@ -17,8 +17,11 @@
     "^@/modules",
     "^@/guards",
     "^@/constants",
+    "^(.*module)$",
+    "^(.*controller)$",
+    "^(.*service)$",
     "^(.*interface)$",
-    "^(.*service)$"
+    "^(.*dto)$"
   ],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,

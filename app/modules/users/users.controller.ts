@@ -21,9 +21,9 @@ import { TSafeUser } from '@/types'
 
 import { AuthGuard } from '@/guards'
 
-import { TUserInstance } from './users.interface'
-
 import { UsersService } from './users.service'
+
+import { TUserInstance } from './users.interface'
 
 @Controller()
 export class UsersController {
