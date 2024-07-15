@@ -135,13 +135,13 @@ export class AuthService {
 
     if (!refreshToken) throw new UnauthorizedException()
 
-    const { userId, role } = await this.jwtService.verifyAsync(refreshToken, {
+    const { id, role } = await this.jwtService.verifyAsync(refreshToken, {
       secret: Constants.Tokens.REFRESH_TOKEN_SECRET_KEY,
       ignoreExpiration: true,
     })
 
     await TokenService.generateTokens(this.jwtService, {
-      userId,
+      id,
       role,
     })
 
