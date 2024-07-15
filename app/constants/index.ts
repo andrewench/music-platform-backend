@@ -1,11 +1,15 @@
-const Constant = {
-  AT_SECRET_KEY: process.env.AT_SECRET_KEY,
-  AT_LIFE_TIME: 1000 * 60 * 15,
+const Constants = {
+  Tokens: {
+    ACCESS_TOKEN_SECRET_KEY: process.env.ACCESS_TOKEN_SECRET_KEY,
+    ACCESS_TOKEN_LIFE_TIME: 60 * 1,
+    ACCESS_TOKEN_PREFIX: 'at',
 
-  RT_SECRET_KEY: process.env.RT_SECRET_KEY,
-  RT_LIFE_TIME: 1000 * 60 * 60 * 24,
+    REFRESH_TOKEN_SECRET_KEY: process.env.REFRESH_TOKEN_SECRET_KEY,
+    REFRESH_TOKEN_LIFE_TIME: 60 * 5,
+    REFRESH_TOKEN_PREFIX: 'rt',
+  },
 
   STATIC_PATH: '/uploads/images',
 }
 
-export default Constant
+export default Constants

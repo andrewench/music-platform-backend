@@ -7,9 +7,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { Request } from 'express'
+import { Request, Response } from 'express'
 
-import { CryptoService, PrismaService } from '@/services'
+import { CryptoService, PrismaService, TokenService } from '@/services'
+
+import { extractTokenFromCookie } from '@/utils'
 
 import Constants from '@/constants'
 
@@ -20,7 +22,7 @@ import { SignUpDto } from './dto/sign-up.dto'
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async login(credentials: SignInDto) {
+  async login(credentials: SignInDto, response: Response) {
     const { login, password } = credentials
 
     const user = await this.prisma.user.findFirst({
@@ -29,47 +31,40 @@ export class AuthService {
       },
     })
 
-    if (!user)
+    if (!user) {
       throw new NotFoundException(`User doesn't exists`, {
         description: 'userNoExists',
       })
+    }
 
     const validPassword = await CryptoService.verify(user.password, password)
 
-    if (!validPassword)
+    if (!validPassword) {
       throw new ForbiddenException('Invalid login or password', {
         description: 'invalidCredentials',
       })
-
-    const accessToken = await this.jwtService.signAsync(
-      {
-        id: user.id,
-        role: user.role,
-      },
-      {
-        expiresIn: Constants.AT_LIFE_TIME,
-        secret: Constants.AT_SECRET_KEY,
-      },
-    )
-
-    const refreshToken = await this.jwtService.signAsync(
-      {
-        id: user.id,
-        role: user.role,
-      },
-      {
-        expiresIn: Constants.RT_LIFE_TIME,
-        secret: Constants.RT_SECRET_KEY,
-      },
-    )
-
-    return {
-      accessToken,
-      refreshToken,
     }
+
+    await TokenService.generateTokens(this.jwtService, {
+      id: user.id,
+      role: user.role,
+    })
+
+    const { accessTokenCookieHeader, refreshTokenCookieHeader } =
+      TokenService.generateHeaders()
+
+    return response
+      .status(200)
+      .setHeader('Set-Cookie', [
+        accessTokenCookieHeader,
+        refreshTokenCookieHeader,
+      ])
+      .json({
+        status: 'OK',
+      })
   }
 
-  async signup(credentials: SignUpDto) {
+  async signup(credentials: SignUpDto, response: Response) {
     const { firstName, lastName, login, email, password } = credentials
 
     const user = await this.prisma.user.findFirst({
@@ -85,10 +80,11 @@ export class AuthService {
       },
     })
 
-    if (user)
+    if (user) {
       throw new ConflictException('User already exists', {
         description: 'userExists',
       })
+    }
 
     const hashedPassword = await CryptoService.encrypt(password)
 
@@ -106,32 +102,23 @@ export class AuthService {
       })
 
       if (user) {
-        const accessToken = await this.jwtService.signAsync(
-          {
-            id: user.id,
-            role: user.role,
-          },
-          {
-            expiresIn: Constants.AT_LIFE_TIME,
-            secret: Constants.AT_SECRET_KEY,
-          },
-        )
+        await TokenService.generateTokens(this.jwtService, {
+          id: user.id,
+          role: user.role,
+        })
 
-        const refreshToken = await this.jwtService.signAsync(
-          {
-            id: user.id,
-            role: user.role,
-          },
-          {
-            expiresIn: Constants.RT_LIFE_TIME,
-            secret: Constants.RT_SECRET_KEY,
-          },
-        )
+        const { accessTokenCookieHeader, refreshTokenCookieHeader } =
+          TokenService.generateHeaders()
 
-        return {
-          accessToken,
-          refreshToken,
-        }
+        return response
+          .status(200)
+          .setHeader('Set-Cookie', [
+            accessTokenCookieHeader,
+            refreshTokenCookieHeader,
+          ])
+          .json({
+            status: 'OK',
+          })
       } else {
         throw new ServiceUnavailableException()
       }
@@ -140,52 +127,52 @@ export class AuthService {
     }
   }
 
-  async refresh(body: { refreshToken: string }) {
-    const payload = await this.jwtService.verifyAsync(body.refreshToken, {
-      secret: process.env.RT_SECRET_KEY,
+  async refresh(request: Request, response: Response) {
+    const refreshToken = extractTokenFromCookie({
+      request,
+      type: 'refresh_token',
     })
 
-    const user = await this.prisma.user.findFirst({
-      where: {
-        id: payload.id,
-      },
+    if (!refreshToken) throw new UnauthorizedException()
+
+    const { userId, role } = await this.jwtService.verifyAsync(refreshToken, {
+      secret: Constants.Tokens.REFRESH_TOKEN_SECRET_KEY,
+      ignoreExpiration: true,
     })
 
-    if (!user) throw new UnauthorizedException(`User doesn't exists`)
+    await TokenService.generateTokens(this.jwtService, {
+      userId,
+      role,
+    })
 
-    const accessToken = await this.jwtService.signAsync(
-      {
-        id: user.id,
-        role: user.role,
-      },
-      {
-        expiresIn: Constants.AT_LIFE_TIME,
-        secret: Constants.AT_SECRET_KEY,
-      },
-    )
+    const { accessTokenCookieHeader, refreshTokenCookieHeader } =
+      TokenService.generateHeaders()
 
-    const refreshToken = await this.jwtService.signAsync(
-      {
-        id: user.id,
-        role: user.role,
-      },
-      {
-        expiresIn: Constants.RT_LIFE_TIME,
-        secret: Constants.RT_SECRET_KEY,
-      },
-    )
-
-    return {
-      accessToken,
-      refreshToken,
-    }
+    return response
+      .status(200)
+      .setHeader('Set-Cookie', [
+        accessTokenCookieHeader,
+        refreshTokenCookieHeader,
+      ])
+      .json({
+        status: 'OK',
+      })
   }
 
-  async logout(request: Request) {
+  async logout(request: Request, response: Response) {
     if (!('user' in request)) throw new UnauthorizedException()
 
-    return {
-      status: 'logged_out',
-    }
+    const { accessTokenExpiredHeader, refreshTokenExpiredHeader } =
+      TokenService.generateExpiredHeaders()
+
+    return response
+      .status(200)
+      .setHeader('Set-Cookie', [
+        accessTokenExpiredHeader,
+        refreshTokenExpiredHeader,
+      ])
+      .json({
+        status: 'OK',
+      })
   }
 }

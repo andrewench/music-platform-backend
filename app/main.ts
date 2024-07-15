@@ -10,6 +10,10 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api')
   app.useGlobalPipes(new ValidationPipe())
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    allowedHeaders: ['Access-Control-Allow-Origin'],
+  })
 
   const prismaService = app.get(PrismaService)
   await prismaService.enableShutdownHooks(app)

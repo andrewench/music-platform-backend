@@ -113,7 +113,7 @@ export class UsersService {
     })
 
     return {
-      isUploaded: true,
+      status: 'OK',
     }
   }
 }
